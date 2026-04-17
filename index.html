@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Riversol — NPD Launch Portfolio</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -83,6 +83,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 
 
 @media(max-width:600px){.kpis{grid-template-columns:1fr 1fr}.prod-grid{grid-template-columns:1fr}body{padding:.75rem}}
+/* Safari mobile fixes */
+*{-webkit-tap-highlight-color:transparent}
+button,select{-webkit-appearance:none;appearance:none}
+body{-webkit-overflow-scrolling:touch}
+.prod-grid{-webkit-overflow-scrolling:touch}
+.team-grid{-webkit-overflow-scrolling:touch}
+@media(max-width:768px){
+  .kpis{grid-template-columns:1fr 1fr}
+  .prod-grid{grid-template-columns:1fr}
+  .rs-header{padding:10px 14px}
+  .rs-wordmark{font-size:18px}
+  .view-btns{gap:4px}
+  .vbtn{padding:5px 10px;font-size:11px}
+  .exec-card{padding:14px}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -205,19 +220,27 @@ const openCats={},openOwners={},openTeamOwners={};
 
 async function fetchProduct(p){
   if(!p.csvUrl){p.tasks=enrichTasks(p.staticTasks||[]);p.launch=getLaunchDate(p.tasks);p.loaded=true;p.live=false;return;}
-  // Try direct first, fall back to CORS proxy for GitHub Pages
-  var urls=[p.csvUrl,"https://corsproxy.io/?"+encodeURIComponent(p.csvUrl)];
-  for(var i=0;i<urls.length;i++){
+  var proxies=[
+    {url:p.csvUrl, parse:function(t){return t;}},
+    {url:"https://api.allorigins.win/get?url="+encodeURIComponent(p.csvUrl), parse:function(t){try{return JSON.parse(t).contents;}catch(e){return t;}}},
+    {url:"https://corsproxy.io/?"+encodeURIComponent(p.csvUrl), parse:function(t){return t;}},
+  ];
+  for(var i=0;i<proxies.length;i++){
     try{
-      const resp=await fetch(urls[i]);
+      var controller=new AbortController();
+      var timeout=setTimeout(function(){controller.abort();},8000);
+      var resp=await fetch(proxies[i].url,{signal:controller.signal});
+      clearTimeout(timeout);
       if(!resp.ok)throw new Error("HTTP "+resp.status);
-      const text=await resp.text();
+      var raw=await resp.text();
+      var text=proxies[i].parse(raw);
+      if(!text||text.length<10)throw new Error("Empty response");
       p.tasks=enrichTasks(parseCSV(text));
       p.launch=getLaunchDate(p.tasks);
       p.loaded=true;p.live=true;p.error=null;
       return;
     }catch(e){
-      if(i===urls.length-1){
+      if(i===proxies.length-1){
         p.loaded=true;p.live=false;p.error="Could not load live data";
         p.tasks=enrichTasks(p.staticTasks||[]);
         p.launch=getLaunchDate(p.tasks);
