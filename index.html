@@ -978,6 +978,46 @@ window.downloadPDF=function(){
   doc.save("Riversol_NPD_Report_"+new Date().toISOString().slice(0,10)+".pdf");
 };
 
+window.selectProduct=function(id){activeId=activeId===id?null:id;renderGrid();renderDetail(activeId?products.find(function(p){return p.id===activeId;}):null);};
+window.toggleCat=function(pid,cat){var k=pid+cat;openCats[k]=!openCats[k];renderDetail(products.find(function(p){return p.id===pid;}));};
+window.toggleOwner=function(pid,o){var k=pid+o;openOwners[k]=!openOwners[k];renderDetail(products.find(function(p){return p.id===pid;}));};
+window.toggleTeamOwner=function(o){openTeamOwners[o]=!openTeamOwners[o];renderTeam();};
+window.toggleTeamOwnerAll=function(btn){var o=btn.getAttribute("data-owner");openTeamOwners[o+"_all"]=!openTeamOwners[o+"_all"];renderTeam();};
+window.toggleHideComplete=function(){hideComplete=!hideComplete;renderTeam();};
+window.kpiClick=function(type){
+  if(type==="overdue"){
+    document.querySelectorAll(".vbtn").forEach(function(b){b.classList.toggle("on",b.dataset.view==="team");});
+    document.getElementById("view-portfolio").style.display="none";
+    document.getElementById("view-team").style.display="";
+    document.getElementById("view-exec").style.display="none";
+    hideComplete=true;
+    var ownerSet=new Set();
+    products.forEach(function(p){p.tasks.forEach(function(t){if(t.dueDate&&t.dueDate<TODAY&&t.resolved!=="Complete")t.owners.forEach(function(o){ownerSet.add(o);});});});
+    ownerSet.forEach(function(o){openTeamOwners[o]=true;});
+    renderTeam();
+  } else {
+    document.querySelectorAll(".vbtn").forEach(function(b){b.classList.toggle("on",b.dataset.view==="portfolio");});
+    document.getElementById("view-portfolio").style.display="";
+    document.getElementById("view-team").style.display="none";
+    document.getElementById("view-exec").style.display="none";
+    if(type==="atrisk"){
+      var rp=products.find(function(p){return getStats(p.tasks,p.launch).rag==="r";});
+      if(rp){activeId=rp.id;renderGrid();renderDetail(rp);}else{renderGrid();}
+    } else if(type==="nextlaunch"){
+      var np=[...products].filter(function(p){return p.launch&&getStats(p.tasks,p.launch).days>0;}).sort(function(a,b){return getStats(a.tasks,a.launch).days-getStats(b.tasks,b.launch).days;})[0];
+      if(np){activeId=np.id;renderGrid();renderDetail(np);}
+    } else {activeId=null;renderGrid();renderDetail(null);}
+  }
+};
+document.querySelectorAll(".vbtn").forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll(".vbtn").forEach(function(x){x.classList.toggle("on",x===b);});
+    document.getElementById("view-portfolio").style.display=b.dataset.view==="portfolio"?"":"none";
+    document.getElementById("view-team").style.display=b.dataset.view==="team"?"":"none";
+    document.getElementById("view-exec").style.display=b.dataset.view==="exec"?"":"none";
+    if(b.dataset.view==="team")populateTeamFilters();
+  });
+});
 Promise.all(products.map(function(p){return fetchProduct(p).then(function(){renderAll();})})).then(function(){
   renderAll();
   var nextp=[...products].filter(function(p){return p.launch&&getStats(p.tasks,p.launch).days>0;}).sort(function(a,b){return getStats(a.tasks,a.launch).days-getStats(b.tasks,b.launch).days;})[0];
