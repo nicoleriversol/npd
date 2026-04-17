@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Riversol — NPD Launch Portfolio</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:#f5f5f3;color:#1a1a1a;padding:1.5rem}
+.page{max-width:1100px;margin:0 auto}
+.rs-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#003D4D;border-radius:10px;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px}
+.rs-wordmark{font-size:22px;font-weight:700;color:#fff;letter-spacing:-0.5px}
+.rs-subtitle{font-size:12px;color:#a8ccd4;margin-top:2px}
+.rs-date{font-size:12px;color:#a8ccd4;text-align:right;line-height:1.6}
+.rs-live{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#6fcf97;margin-top:3px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#6fcf97;flex-shrink:0}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.25rem}
+.kpi{background:#fff;border-radius:8px;padding:12px 14px;border:0.5px solid #e0e0d8;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.kpi:hover{border-color:#003D4D;box-shadow:0 0 0 2px rgba(0,61,77,0.08)}
+.kpi-v{font-size:26px;font-weight:500;line-height:1.1;margin-bottom:2px}
+.kpi-l{font-size:11px;color:#666}
+.kpi-hint{font-size:10px;color:#a8ccd4;margin-top:4px}
+.view-btns{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap}
+.vbtn{padding:6px 14px;border-radius:20px;font-size:12px;cursor:pointer;border:0.5px solid #003D4D;background:transparent;color:#003D4D;font-weight:500;transition:all .15s}
+.vbtn.on{background:#003D4D;color:#fff}
+.legend{display:flex;gap:14px;margin-bottom:1rem;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:#666}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:1.25rem}
+.prod-card{background:#fff;border:0.5px solid #e0e0d8;border-radius:12px;overflow:hidden;cursor:pointer;transition:border-color .15s}
+.prod-card:hover{border-color:#003D4D}
+.prod-card.active{border:2px solid #003D4D}
+.prod-card-top{padding:14px 16px 10px}
+.prod-card-bar-wrap{height:4px;background:#f0f0ee}
+.prod-card-bar{height:4px}
+.prod-card-bot{padding:9px 16px 12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rag-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:500}
+.rag-g{background:#E0F2EA;color:#1A5F3A}
+.rag-a{background:#FEF3E2;color:#7A4A00}
+.rag-r{background:#FDECEA;color:#8B1A1A}
+.days-badge{font-size:11px;padding:3px 9px;border-radius:12px;font-weight:500}
+.days-ok{background:#E0EEF1;color:#003D4D}
+.days-soon{background:#FEF3E2;color:#7A4A00}
+.days-urgent{background:#FDECEA;color:#8B1A1A}
+.stacked{height:6px;border-radius:3px;overflow:hidden;display:flex;flex:1}
+.s-done{background:#1D9E75;height:6px}
+.s-ong{background:#BA7517;height:6px}
+.s-ns{background:#D0DEE1;height:6px}
+.live-tag{font-size:10px;background:#E0F5EA;color:#1A5F3A;border-radius:4px;padding:1px 5px;font-weight:500;flex-shrink:0}
+.static-tag{font-size:10px;background:#f0f0ee;color:#888;border-radius:4px;padding:1px 5px;flex-shrink:0}
+.loading-card{background:#f0f0ee;border-radius:12px;padding:20px 16px;display:flex;align-items:center;gap:10px;font-size:13px;color:#666}
+.spin{width:16px;height:16px;border:2px solid #D0DEE1;border-top-color:#003D4D;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.section-label{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:#999;margin-bottom:10px}
+.detail-panel{background:#fff;border:0.5px solid #e0e0d8;border-radius:12px;padding:16px;margin-bottom:1.25rem}
+.detail-hdr{margin-bottom:14px;padding-bottom:12px;border-bottom:0.5px solid #e8e8e4}
+.detail-title{font-size:16px;font-weight:500;color:#003D4D}
+.detail-sub{font-size:12px;color:#666;margin-top:2px}
+.vtabs{display:flex;border-bottom:0.5px solid #e8e8e4;margin-bottom:1rem}
+.vtab{padding:7px 14px;font-size:13px;cursor:pointer;border:none;background:transparent;color:#666;border-bottom:2px solid transparent;margin-bottom:-1px}
+.vtab.on{color:#003D4D;border-bottom-color:#003D4D;font-weight:500}
+.grp-card{background:#fff;border:0.5px solid #e0e0d8;border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer}
+.grp-card:hover{border-color:#ccc}
+.task-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid #f0f0ee;font-size:12px}
+.task-row:last-child{border:none}
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;white-space:nowrap;flex-shrink:0}
+.b-done{background:#E0F2EA;color:#1A5F3A}
+.b-ong{background:#FEF3E2;color:#7A4A00}
+.b-ns{background:#f0f0ee;color:#666}
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;background:#E0EEF1;color:#003D4D}
+.team-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:1.25rem}
+.po-card{background:#fff;border:0.5px solid #e0e0d8;border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.po-card:hover{border-color:#003D4D}
+.error-note{font-size:12px;color:#A32D2D;background:#FDECEA;border-radius:6px;padding:6px 10px;margin-bottom:8px}
+.exec-card{background:#fff;border:0.5px solid #e0e0d8;border-radius:12px;padding:16px;margin-bottom:1rem}
+.exec-table{width:100%;border-collapse:collapse}
+.exec-table th{padding:10px 14px;font-size:10px;font-weight:600;color:#003D4D;text-align:left;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #003D4D;white-space:nowrap}
+.exec-table td{padding:12px 14px;font-size:13px;border-bottom:0.5px solid #f0f0ee;vertical-align:middle}
+.exec-table tr:last-child td{border-bottom:none}
+.exec-table tr:hover td{background:#f9fbfc}
+.rag-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;display:inline-block}
+.slack-box{background:#1a1d21;border-radius:10px;padding:16px 20px;font-family:monospace;font-size:13px;color:#d1d2d3;line-height:1.7;white-space:pre-wrap;word-break:break-word;margin-bottom:1rem;position:relative}
+.copy-btn{position:absolute;top:12px;right:12px;padding:5px 12px;border-radius:6px;font-size:11px;font-weight:500;cursor:pointer;border:0.5px solid #4a4d52;background:#2a2d31;color:#d1d2d3;transition:background .15s}
+.copy-btn:hover{background:#3a3d41}
+@media(max-width:600px){.kpis{grid-template-columns:1fr 1fr}.prod-grid{grid-template-columns:1fr}body{padding:.75rem}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="rs-header">
+  <div>
+    <div class="rs-wordmark">Riversol</div>
+    <div class="rs-subtitle">NPD launch portfolio</div>
+  </div>
+  <div class="rs-date" id="hdr-date"></div>
+</div>
+
+<div class="kpis" id="kpis">
+  <div class="kpi" style="grid-column:span 4;display:flex;align-items:center;gap:10px;cursor:default">
+    <div class="spin"></div>
+    <span style="font-size:13px;color:#666">Loading live data…</span>
+  </div>
+</div>
+
+<div class="view-btns">
+  <button class="vbtn on" data-view="portfolio">Portfolio overview</button>
+  <button class="vbtn" data-view="team">Team workload</button>
+  <button class="vbtn" data-view="exec">Exec summary</button>
+</div>
+
+<!-- PORTFOLIO VIEW -->
+<div id="view-portfolio">
+  <div class="legend">
+    <span class="leg"><span class="leg-dot" style="background:#1D9E75"></span>Complete</span>
+    <span class="leg"><span class="leg-dot" style="background:#BA7517"></span>Ongoing</span>
+    <span class="leg"><span class="leg-dot" style="background:#D0DEE1"></span>Not started</span>
+    <span class="leg" style="margin-left:8px"><span class="live-tag">live</span> Google Sheets</span>
+    <span class="leg"><span class="static-tag">static</span> Publish to activate</span>
+  </div>
+  <div class="prod-grid" id="prod-grid"></div>
+  <div id="detail-panel"></div>
+</div>
+
+<!-- TEAM VIEW -->
+<div id="view-team" style="display:none">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+    <div class="section-label" style="margin-bottom:0;flex-shrink:0">Workload across all products</div>
+    <select id="filter-product" onchange="renderTeam()" style="padding:5px 8px;border-radius:8px;font-size:12px;border:0.5px solid #003D4D;background:#fff;color:#003D4D;cursor:pointer"><option value="">All products</option></select>
+    <select id="filter-category" onchange="renderTeam()" style="padding:5px 8px;border-radius:8px;font-size:12px;border:0.5px solid #003D4D;background:#fff;color:#003D4D;cursor:pointer"><option value="">All categories</option></select>
+    <button id="toggle-complete-btn" onclick="toggleHideComplete()" style="padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:0.5px solid #003D4D;background:transparent;color:#003D4D;font-weight:500;margin-left:auto">Hide completed</button>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:#666"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#E24B4A;flex-shrink:0"></span>Overdue</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:#666"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#BA7517;flex-shrink:0"></span>Due within 7 days</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:#666"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#1D9E75;flex-shrink:0"></span>Due within 30 days</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:#666"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#D0DEE1;flex-shrink:0"></span>Later</span>
+  </div>
+  <div class="team-grid" id="team-grid"></div>
+</div>
+
+<!-- EXEC SUMMARY VIEW -->
+<div id="view-exec" style="display:none">
+  <div id="exec-content"></div>
+  <div style="margin-top:1rem">
+    <div class="section-label" style="margin-bottom:10px">Slack-ready summary</div>
+    <div style="position:relative">
+      <div class="slack-box" id="slack-text"></div>
+      <button class="copy-btn" onclick="copySlack()">Copy</button>
+    </div>
+    <div id="copy-confirm" style="font-size:11px;color:#1A5F3A;margin-top:4px;display:none">Copied to clipboard!</div>
+  </div>
+</div>
+
+</div>
+<script>
+const TODAY = new Date();
+
+const OC = {
+  "Nicole Ivory":   {bg:"#E0EEF1",fg:"#003D4D"},
+  "Ali Slade":      {bg:"#FBEAF0",fg:"#72243E"},
+  "David Woodward": {bg:"#EAF3DE",fg:"#27500A"},
+  "Gail Colbon":    {bg:"#FAEEDA",fg:"#633806"},
+  "Tomas Leiva":    {bg:"#EEEDFE",fg:"#3C3489"},
+  "Una Mey":        {bg:"#E1F5EE",fg:"#085041"},
+  "Parul Parul":    {bg:"#FAECE7",fg:"#712B13"},
+  "Annelise Nunes": {bg:"#F1EFE8",fg:"#444441"},
+};
+const defOC = {bg:"#E0EEF1",fg:"#003D4D"};
+
+const PRODUCT_CONFIG = [
+  {id:"peptide-hand-balm",   name:"Peptide Hand Balm",    csvUrl:"https://docs.google.com/spreadsheets/d/e/2PACX-1vRtZ_LNvtNrTZrqR9sm0Hg81OEiNQtC8fu-KB3kIoM9IQZK5Xj2tlfUXvggLgQTjkjPBTzqJwdOqNXj/pub?gid=1508687742&single=true&output=csv", staticTasks:null},
+  {id:"hydrating-serum",     name:"Hydrating Serum",       csvUrl:"https://docs.google.com/spreadsheets/d/e/2PACX-1vRtZ_LNvtNrTZrqR9sm0Hg81OEiNQtC8fu-KB3kIoM9IQZK5Xj2tlfUXvggLgQTjkjPBTzqJwdOqNXj/pub?gid=1070645485&single=true&output=csv", staticTasks:null},
+  {id:"hydrogel-masks",      name:"Hydrogel Masks",        csvUrl:"https://docs.google.com/spreadsheets/d/e/2PACX-1vRtZ_LNvtNrTZrqR9sm0Hg81OEiNQtC8fu-KB3kIoM9IQZK5Xj2tlfUXvggLgQTjkjPBTzqJwdOqNXj/pub?gid=1316957087&single=true&output=csv", staticTasks:null},
+  {id:"gel-moisturizer",     name:"Gel Moisturizer",       csvUrl:"https://docs.google.com/spreadsheets/d/e/2PACX-1vRtZ_LNvtNrTZrqR9sm0Hg81OEiNQtC8fu-KB3kIoM9IQZK5Xj2tlfUXvggLgQTjkjPBTzqJwdOqNXj/pub?gid=197878153&single=true&output=csv", staticTasks:null},
+  {id:"exfoliating-cleanser",name:"Exfoliating Cleanser",  csvUrl:"https://docs.google.com/spreadsheets/d/e/2PACX-1vRtZ_LNvtNrTZrqR9sm0Hg81OEiNQtC8fu-KB3kIoM9IQZK5Xj2tlfUXvggLgQTjkjPBTzqJwdOqNXj/pub?gid=594494885&single=true&output=csv", staticTasks:null},
+  {id:"under-eye-patches",   name:"Under Eye Patches",     csvUrl:"https://docs.google.com/spreadsheets/d/e/2PACX-1vRtZ_LNvtNrTZrqR9sm0Hg81OEiNQtC8fu-KB3kIoM9IQZK5Xj2tlfUXvggLgQTjkjPBTzqJwdOqNXj/pub?gid=330328120&single=true&output=csv", staticTasks:null},
+];
+
+function splitCSVLine(line){const r=[];let c="",q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){q=!q;}else if(ch===','&&!q){r.push(c.trim());c="";}else{c+=ch;}}r.push(c.trim());return r;}
+function parseDue(raw){if(!raw)return"";if(/^\d{4,5}$/.test(raw)){const d=new Date(Date.UTC(1899,11,30)+parseInt(raw)*86400000);return d.toISOString().slice(0,10);}if(/\d{4}/.test(raw)){const d=new Date(raw);if(!isNaN(d))return d.toISOString().slice(0,10);}return"";}
+const KNOWN_OWNERS=["Nicole Ivory","Ali Slade","David Woodward","Gail Colbon","Tomas Leiva","Una Mey","Parul Parul","Annelise Nunes"];
+function parseOwners(raw){const found=[];let rem=raw;KNOWN_OWNERS.forEach(function(n){if(rem.includes(n)){found.push(n);rem=rem.replace(n,"").trim();}});return found.length?found:[raw||"Unassigned"];}
+function parseCSV(text){const lines=text.trim().split("\n");if(lines.length<2)return[];const headers=lines[0].split(",").map(function(h){return h.replace(/^"|"$/g,"").trim().toLowerCase();});const iCat=headers.findIndex(function(h){return h.includes("category");});const iTask=headers.findIndex(function(h){return h.includes("task");});const iStage=headers.findIndex(function(h){return h.includes("stage");});const iDue=headers.findIndex(function(h){return h.includes("target")||h.includes("completion")||h.includes("due");});const iOwner=headers.findIndex(function(h){return h.includes("owner");});const iStatus=headers.findIndex(function(h){return h.includes("status");});return lines.slice(1).map(function(l){const c=splitCSVLine(l);const task=(c[iTask]||"").trim();if(!task)return null;return{cat:(c[iCat]||"").trim(),task:task,stage:(c[iStage]||"").trim(),due:parseDue((c[iDue]||"").trim()),owners:parseOwners((c[iOwner]||"").trim()),status:(c[iStatus]||"").trim()};}).filter(Boolean);}
+function resolveStatus(t){const s=(t.status||"").trim();if(/^complete/i.test(s))return"Complete";if(/^ongoing/i.test(s))return"Ongoing";return"Not Started";}
+function enrichTasks(raw){return raw.map(function(t){return Object.assign({},t,{resolved:resolveStatus(t),dueDate:t.due?new Date(t.due):null});});}
+function getLaunchDate(tasks){const d=tasks.find(function(t){return /product.?delivery/i.test(t.task);});return d&&d.dueDate?d.dueDate:null;}
+function getStats(tasks,launch){
+  const total=tasks.length,done=tasks.filter(function(t){return t.resolved==="Complete";}).length,ong=tasks.filter(function(t){return t.resolved==="Ongoing";}).length,ns=tasks.filter(function(t){return t.resolved==="Not Started";}).length;
+  const overdue=tasks.filter(function(t){return t.dueDate&&t.dueDate<TODAY&&t.resolved!=="Complete";});
+  const days=launch?Math.round((launch-TODAY)/(1000*60*60*24)):null;
+  const pctDone=total?Math.round(done/total*100):0;
+  let rag="g";
+  if(overdue.length>=3||(days!==null&&days<20))rag="r";
+  else if(overdue.length>=1||ong>=3||(days!==null&&days<50))rag="a";
+  return{total:total,done:done,ong:ong,ns:ns,overdue:overdue,days:days,pctDone:pctDone,rag:rag};
+}
+
+const products=PRODUCT_CONFIG.map(function(p){return Object.assign({},p,{loaded:false,live:false,error:null,tasks:[],launch:null});});
+let activeId=null;
+let hideComplete=false;
+const openCats={},openOwners={},openTeamOwners={};
+
+async function fetchProduct(p){
+  if(!p.csvUrl){p.tasks=enrichTasks(p.staticTasks||[]);p.launch=getLaunchDate(p.tasks);p.loaded=true;p.live=false;return;}
+  try{const resp=await fetch(p.csvUrl);if(!resp.ok)throw new Error("HTTP "+resp.status);const text=await resp.text();p.tasks=enrichTasks(parseCSV(text));p.launch=getLaunchDate(p.tasks);p.loaded=true;p.live=true;p.error=null;}
+  catch(e){p.loaded=true;p.live=false;p.error="Could not load live data";p.tasks=enrichTasks(p.staticTasks||[]);p.launch=getLaunchDate(p.tasks);}
+}
+
+function fmtD(d){return d?d.toLocaleDateString("en-GB",{day:"numeric",month:"short"}):"TBC";}
+function fmtDLong(d){return d?d.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}):"TBC";}
+function fmtDShort(d){return d?d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):"TBC";}
+function inits(n){return n.split(" ").map(function(w){return w[0]||"";}).join("").slice(0,2).toUpperCase();}
+function pct(a,b){return b?Math.round(a/b*100):0;}
+
+function dueBand(dueDate){
+  if(!dueDate)return{label:"No date",dot:"#D0DEE1",text:"#888"};
+  const days=Math.round((dueDate-TODAY)/(1000*60*60*24));
+  if(days<0)return{label:"Overdue",dot:"#E24B4A",text:"#A32D2D"};
+  if(days<=7)return{label:"Due in "+days+"d",dot:"#BA7517",text:"#7A4A00"};
+  if(days<=30)return{label:"Due in "+days+"d",dot:"#1D9E75",text:"#1A5F3A"};
+  return{label:fmtD(dueDate),dot:"#D0DEE1",text:"#888"};
+}
+
+function renderAll(){renderKPIs();renderGrid();if(activeId){const ap=products.find(function(p){return p.id===activeId;});if(ap)renderDetail(ap);}renderTeam();renderExec();}
+
+function renderKPIs(){
+  const over=products.reduce(function(s,p){return s+getStats(p.tasks,p.launch).overdue.length;},0);
+  const atRisk=products.filter(function(p){return getStats(p.tasks,p.launch).rag==="r";}).length;
+  const watches=products.filter(function(p){return getStats(p.tasks,p.launch).rag==="a";}).length;
+  const nextp=[...products].filter(function(p){return p.launch&&getStats(p.tasks,p.launch).days>0;}).sort(function(a,b){return getStats(a.tasks,a.launch).days-getStats(b.tasks,b.launch).days;})[0];
+  const nextDays=nextp?getStats(nextp.tasks,nextp.launch).days:"--";
+  const nextName=nextp?nextp.name:"";
+  const nextDate=nextp?fmtDLong(nextp.launch):"";
+  const el=document.getElementById("kpis");
+  el.innerHTML=
+    '<div class="kpi" onclick="kpiClick(\'launches\')">'
+      +'<div class="kpi-v" style="color:#003D4D">'+products.length+'</div>'
+      +'<div class="kpi-l">Active launches</div>'
+      +'<div class="kpi-hint">Click to view \u2192</div>'
+    +'</div>'
+    +'<div class="kpi" style="border-color:'+(atRisk?"#f7c1c1":"#e0e0d8")+'" onclick="kpiClick(\'atrisk\')">'
+      +'<div class="kpi-v" style="color:'+(atRisk?"#A32D2D":"#003D4D")+'">'+atRisk+'</div>'
+      +'<div class="kpi-l">At risk \u00b7 '+watches+' watch</div>'
+      +'<div class="kpi-hint">Click to view \u2192</div>'
+    +'</div>'
+    +'<div class="kpi" style="border-color:'+(over?"#f7c1c1":"#e0e0d8")+'" onclick="kpiClick(\'overdue\')">'
+      +'<div class="kpi-v" style="color:'+(over?"#A32D2D":"#003D4D")+'">'+over+'</div>'
+      +'<div class="kpi-l">Overdue tasks</div>'
+      +'<div class="kpi-hint">Click to view \u2192</div>'
+    +'</div>'
+    +'<div class="kpi" style="border-color:#c0dde6;background:#eaf4f7" onclick="kpiClick(\'nextlaunch\')">'
+      +'<div style="font-size:40px;font-weight:700;line-height:1;color:#003D4D;margin-bottom:4px">'+nextDays+'</div>'
+      +'<div style="font-size:12px;font-weight:500;color:#003D4D;margin-bottom:2px">Days to next launch</div>'
+      +'<div style="font-size:11px;color:#1A5F70">'+nextName+'</div>'
+      +'<div style="font-size:10px;color:#4A8A9A;margin-top:1px">'+nextDate+'</div>'
+    +'</div>';
+}
+
+function renderGrid(){
+  document.getElementById("prod-grid").innerHTML=products.map(function(p){
+    if(!p.loaded)return '<div class="loading-card"><div class="spin"></div>'+p.name+'</div>';
+    const s=getStats(p.tasks,p.launch);
+    const ragLabel=s.rag==="r"?"At risk":s.rag==="a"?"Watch":"On track";
+    const ragCls=s.rag==="r"?"rag-r":s.rag==="a"?"rag-a":"rag-g";
+    const daysCls=s.days===null?"days-ok":s.days<30?"days-urgent":s.days<60?"days-soon":"days-ok";
+    const daysLabel=s.days===null?"No delivery date":s.days<=0?"Launched":s.days+"d to launch";
+    const barClr=s.rag==="r"?"#E24B4A":s.rag==="a"?"#BA7517":"#1D9E75";
+    const isActive=activeId===p.id;
+    const esc=p.id.replace(/'/g,"\\'");
+    return '<div class="prod-card'+(isActive?" active":"")+'" onclick="selectProduct(\''+esc+'\')">'
+      +'<div class="prod-card-top">'
+        +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px">'
+          +'<div>'
+            +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
+              +'<span style="font-size:14px;font-weight:500;color:#003D4D">'+p.name+'</span>'
+              +(p.live?'<span class="live-tag">live</span>':'<span class="static-tag">static</span>')
+            +'</div>'
+            +'<div style="font-size:11px;color:#666">Launch '+fmtD(p.launch)+'</div>'
+          +'</div>'
+          +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">'
+            +'<span class="rag-pill '+ragCls+'">'+ragLabel+'</span>'
+            +'<span class="days-badge '+daysCls+'">'+daysLabel+'</span>'
+          +'</div>'
+        +'</div>'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+          +'<div class="stacked">'
+            +'<div class="s-done" style="width:'+pct(s.done,s.total)+'%"></div>'
+            +'<div class="s-ong" style="width:'+pct(s.ong,s.total)+'%"></div>'
+            +'<div class="s-ns" style="width:'+pct(s.ns,s.total)+'%"></div>'
+          +'</div>'
+          +'<span style="font-size:12px;font-weight:500;color:#003D4D;min-width:32px;text-align:right">'+s.pctDone+'%</span>'
+        +'</div>'
+      +'</div>'
+      +'<div class="prod-card-bar-wrap"><div class="prod-card-bar" style="width:'+s.pctDone+'%;background:'+barClr+'"></div></div>'
+      +'<div class="prod-card-bot">'
+        +'<span style="font-size:11px;color:#999">'+s.done+'/'+s.total+' done</span>'
+        +(s.overdue.length?'<span style="font-size:11px;color:#A32D2D">'+s.overdue.length+' overdue</span>':"")
+        +(s.ong?'<span style="font-size:11px;color:#BA7517">'+s.ong+' ongoing</span>':"")
+        +'<span style="font-size:11px;color:#003D4D;margin-left:auto">'+(isActive?'Hide \u25b2':'Detail \u25bc')+'</span>'
+      +'</div>'
+    +'</div>';
+  }).join("");
+}
+
+function renderDetail(p){
+  const panel=document.getElementById("detail-panel");
+  if(!p){panel.innerHTML="";return;}
+  const s=getStats(p.tasks,p.launch);
+  const catMap={},owMap={};
+  p.tasks.forEach(function(t){
+    if(!catMap[t.cat])catMap[t.cat]=[];catMap[t.cat].push(t);
+    t.owners.forEach(function(o){if(!owMap[o])owMap[o]=[];owMap[o].push(t);});
+  });
+  const dtId="dt-"+p.id,catId="dc-"+p.id,owId="do-"+p.id;
+
+  function ownerChip(o){
+    const c=OC[o]||defOC;
+    return '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500;background:'+c.bg+';color:'+c.fg+';white-space:nowrap;margin:1px 2px 1px 0">'+o+'</span>';
+  }
+  function taskRow(t){
+    const sc=t.resolved==="Complete"?"b-done":t.resolved==="Ongoing"?"b-ong":"b-ns";
+    const chips=(t.owners||[]).map(ownerChip).join("");
+    return '<div class="task-row">'
+      +'<span style="flex:1;color:#1a1a1a;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+t.task+'</span>'
+      +'<span style="display:flex;flex-wrap:wrap;gap:2px;justify-content:flex-end;min-width:120px;margin:0 8px">'+chips+'</span>'
+      +'<span class="badge '+sc+'">'+t.resolved+'</span>'
+      +'<span style="font-size:11px;color:#999;min-width:52px;text-align:right">'+fmtD(t.dueDate)+'</span>'
+    +'</div>';
+  }
+
+  const catHTML=Object.keys(catMap).sort().map(function(cat){
+    const ts=catMap[cat];
+    const d=ts.filter(function(t){return t.resolved==="Complete";}).length;
+    const og=ts.filter(function(t){return t.resolved==="Ongoing";}).length;
+    const n=ts.filter(function(t){return t.resolved==="Not Started";}).length;
+    const tot=ts.length;
+    const k=p.id+cat,isOpen=openCats[k];
+    const esc=cat.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+    const pid=p.id.replace(/'/g,"\\'");
+    return '<div class="grp-card" onclick="toggleCat(\''+pid+'\',\''+esc+'\')">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">'
+        +'<span style="font-size:13px;font-weight:500;color:#003D4D;flex:1">'+cat+'</span>'
+        +'<span style="font-size:12px;color:#666">'+pct(d,tot)+'% done</span>'
+      +'</div>'
+      +'<div class="stacked" style="height:5px;margin-bottom:6px">'
+        +'<div class="s-done" style="width:'+pct(d,tot)+'%;height:5px"></div>'
+        +'<div class="s-ong" style="width:'+pct(og,tot)+'%;height:5px"></div>'
+        +'<div class="s-ns" style="width:'+pct(n,tot)+'%;height:5px"></div>'
+      +'</div>'
+      +'<div style="display:flex;gap:10px">'
+        +'<span style="font-size:11px;color:#1A5F3A">'+d+' done</span>'
+        +(og?'<span style="font-size:11px;color:#7A4A00">'+og+' ongoing</span>':"")
+        +(n?'<span style="font-size:11px;color:#666">'+n+' not started</span>':"")
+      +'</div>'
+      +'<div style="display:'+(isOpen?"block":"none")+';margin-top:10px;border-top:0.5px solid #f0f0ee;padding-top:8px">'
+        +ts.map(taskRow).join("")
+      +'</div>'
+    +'</div>';
+  }).join("");
+
+  const owHTML=Object.keys(owMap).sort().map(function(o){
+    const ts=owMap[o];
+    const d=ts.filter(function(t){return t.resolved==="Complete";}).length;
+    const og=ts.filter(function(t){return t.resolved==="Ongoing";}).length;
+    const n=ts.filter(function(t){return t.resolved==="Not Started";}).length;
+    const tot=ts.length;
+    const col=OC[o]||defOC;
+    const k=p.id+o,isOpen=openOwners[k];
+    const esc=o.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+    const pid=p.id.replace(/'/g,"\\'");
+    return '<div class="grp-card" onclick="toggleOwner(\''+pid+'\',\''+esc+'\')">'
+      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+        +'<div class="av" style="background:'+col.bg+';color:'+col.fg+'">'+inits(o)+'</div>'
+        +'<div style="flex:1">'
+          +'<div style="font-size:13px;font-weight:500;color:#003D4D">'+o+'</div>'
+          +'<div style="font-size:11px;color:#666">'+tot+' tasks \u00b7 '+pct(d,tot)+'% complete</div>'
+        +'</div>'
+        +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">'
+          +(d?'<span class="badge b-done">'+d+' done</span>':"")
+          +(og?'<span class="badge b-ong">'+og+' ongoing</span>':"")
+          +(n?'<span class="badge b-ns">'+n+' not started</span>':"")
+        +'</div>'
+      +'</div>'
+      +'<div class="stacked" style="height:5px">'
+        +'<div class="s-done" style="width:'+pct(d,tot)+'%;height:5px"></div>'
+        +'<div class="s-ong" style="width:'+pct(og,tot)+'%;height:5px"></div>'
+        +'<div class="s-ns" style="width:'+pct(n,tot)+'%;height:5px"></div>'
+      +'</div>'
+      +'<div style="display:'+(isOpen?"block":"none")+';margin-top:10px;border-top:0.5px solid #f0f0ee;padding-top:8px">'
+        +["Not Started","Ongoing","Complete"].map(function(grp){
+          const gt=ts.filter(function(t){return t.resolved===grp;});
+          if(!gt.length)return"";
+          return '<div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:#999;margin:6px 0 3px">'+grp+' ('+gt.length+')</div>'
+            +gt.filter(function(t){return t.dueDate;}).sort(function(a,b){return a.dueDate-b.dueDate;}).map(function(t){
+              return '<div class="task-row">'
+                +'<span style="flex:1;color:#1a1a1a;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+t.task+'</span>'
+                +'<span style="font-size:11px;color:#999;white-space:nowrap;margin:0 4px">'+t.cat+'</span>'
+                +'<span style="font-size:11px;color:#999;min-width:52px;text-align:right">'+fmtD(t.dueDate)+'</span>'
+              +'</div>';
+            }).join("");
+        }).join("")
+      +'</div>'
+    +'</div>';
+  }).join("");
+
+  panel.innerHTML=
+    '<div class="detail-panel">'
+      +'<div class="detail-hdr">'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+          +'<div class="detail-title">'+p.name+'</div>'
+          +(p.live?'<span class="live-tag">live data</span>':'<span class="static-tag">static data</span>')
+        +'</div>'
+        +'<div class="detail-sub">'+s.done+'/'+s.total+' tasks complete \u00b7 launch: '+fmtDLong(p.launch)+' <span style="font-size:10px;color:#999">(from Product delivery task)</span></div>'
+      +'</div>'
+      +(p.error?'<div class="error-note">'+p.error+'</div>':"")
+      +'<div class="vtabs" id="'+dtId+'">'
+        +'<button class="vtab on" data-dt="cat">By category</button>'
+        +'<button class="vtab" data-dt="owner">By owner</button>'
+      +'</div>'
+      +'<div id="'+catId+'">'+catHTML+'</div>'
+      +'<div id="'+owId+'" style="display:none">'+owHTML+'</div>'
+    +'</div>';
+
+  document.querySelectorAll("#"+dtId+" .vtab").forEach(function(b){
+    b.addEventListener("click",function(){
+      document.querySelectorAll("#"+dtId+" .vtab").forEach(function(x){x.classList.toggle("on",x===b);});
+      document.getElementById(catId).style.display=b.dataset.dt==="cat"?"":"none";
+      document.getElementById(owId).style.display=b.dataset.dt==="owner"?"":"none";
+    });
+  });
+}
+
+function populateTeamFilters(){
+  const pSel=document.getElementById("filter-product");
+  const cSel=document.getElementById("filter-category");
+  if(!pSel||!cSel)return;
+  const pVal=pSel.value,cVal=cSel.value;
+  const cats=new Set();
+  products.forEach(function(p){p.tasks.forEach(function(t){cats.add(t.cat);});});
+  pSel.innerHTML='<option value="">All products</option>'+products.map(function(p){return '<option value="'+p.id+'"'+(pVal===p.id?' selected':'')+'>'+p.name+'</option>';}).join('');
+  cSel.innerHTML='<option value="">All categories</option>'+[...cats].sort().map(function(c){return '<option value="'+c+'"'+(cVal===c?' selected':'')+'>'+c+'</option>';}).join('');
+}
+
+function renderTeam(){
+  const btn=document.getElementById("toggle-complete-btn");
+  if(btn){btn.style.background=hideComplete?"#003D4D":"transparent";btn.style.color=hideComplete?"#fff":"#003D4D";btn.textContent=hideComplete?"Show completed":"Hide completed";}
+  populateTeamFilters();
+  const filterProd=(document.getElementById("filter-product")||{}).value||"";
+  const filterCat=(document.getElementById("filter-category")||{}).value||"";
+  const owMap={};
+  products.forEach(function(p){
+    if(filterProd&&p.id!==filterProd)return;
+    p.tasks.forEach(function(t){
+      if(hideComplete&&t.resolved==="Complete")return;
+      if(filterCat&&t.cat!==filterCat)return;
+      t.owners.forEach(function(o){
+        if(!owMap[o])owMap[o]={tot:0,done:0,ong:0,ns:0,over:0,prods:new Set(),taskList:[]};
+        owMap[o].tot++;owMap[o].prods.add(p.name);
+        if(t.resolved==="Complete")owMap[o].done++;
+        else if(t.resolved==="Ongoing")owMap[o].ong++;
+        else owMap[o].ns++;
+        if(t.dueDate&&t.dueDate<TODAY&&t.resolved!=="Complete")owMap[o].over++;
+        owMap[o].taskList.push(Object.assign({},t,{productName:p.name}));
+      });
+    });
+  });
+
+  if(Object.keys(owMap).length===0){
+    document.getElementById("team-grid").innerHTML='<div style="font-size:13px;color:#666;padding:12px 0">No tasks match the current filters.</div>';
+    return;
+  }
+
+  document.getElementById("team-grid").innerHTML=Object.keys(owMap).sort().map(function(o){
+    const v=owMap[o];
+    const col=OC[o]||defOC;
+    const isOpen=openTeamOwners[o];
+    const sorted=v.taskList.filter(function(t){return t.dueDate;}).sort(function(a,b){return a.dueDate-b.dueDate;});
+    const noDue=v.taskList.filter(function(t){return !t.dueDate;});
+    const all=sorted.concat(noDue);
+    const LIMIT=10;
+    const showAll=openTeamOwners[o+"_all"]||false;
+    const visible=showAll?all:all.slice(0,LIMIT);
+    const esc=o.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+
+    const tableRows=visible.map(function(t){
+      const sc=t.resolved==="Complete"?"b-done":t.resolved==="Ongoing"?"b-ong":"b-ns";
+      const band=t.resolved==="Complete"?{label:fmtD(t.dueDate),dot:"#D0DEE1",text:"#888"}:dueBand(t.dueDate);
+      return '<tr style="border-bottom:0.5px solid #f0f0ee">'
+        +'<td style="padding:7px 10px 7px 0;font-size:12px;color:#003D4D;font-weight:500;white-space:nowrap;min-width:120px">'+t.productName+'</td>'
+        +'<td style="padding:7px 10px;font-size:12px;color:#666;white-space:nowrap">'+t.cat+'</td>'
+        +'<td style="padding:7px 10px;font-size:12px;color:#1a1a1a;min-width:180px">'+t.task+'</td>'
+        +'<td style="padding:7px 0 7px 10px;white-space:nowrap;text-align:right"><span class="badge '+sc+'">'+t.resolved+'</span></td>'
+        +'<td style="padding:7px 0 7px 10px;white-space:nowrap;text-align:right;min-width:100px">'
+          +'<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:'+band.text+'">'
+            +'<span style="width:7px;height:7px;border-radius:50%;background:'+band.dot+';flex-shrink:0"></span>'
+            +band.label
+          +'</span>'
+        +'</td>'
+      +'</tr>';
+    }).join("");
+
+    const showMoreRow=all.length>LIMIT
+      ?'<tr><td colspan="5" style="padding:8px 0;text-align:center"><button onclick="event.stopPropagation();toggleTeamOwnerAll(this)" data-owner="'+esc+'" style="font-size:12px;color:#003D4D;background:none;border:0.5px solid #003D4D;border-radius:20px;padding:4px 14px;cursor:pointer">'
+        +(showAll?'Show less':'Show all '+all.length+' tasks')
+        +'</button></td></tr>'
+      :'';
+
+    return '<div class="po-card" onclick="toggleTeamOwner(\''+esc+'\')">'
+      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">'
+        +'<div class="av" style="background:'+col.bg+';color:'+col.fg+'">'+inits(o)+'</div>'
+        +'<div style="flex:1">'
+          +'<div style="font-size:13px;font-weight:500;color:#003D4D">'+o+'</div>'
+          +'<div style="font-size:11px;color:#666">'+v.tot+' tasks \u00b7 '+v.prods.size+' product'+(v.prods.size>1?"s":"")+'</div>'
+        +'</div>'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+          +(v.over?'<span style="font-size:11px;font-weight:500;color:#A32D2D">'+v.over+' overdue</span>':"")
+          +'<span style="font-size:11px;color:#003D4D">'+(isOpen?"\u25b2":"\u25bc")+'</span>'
+        +'</div>'
+      +'</div>'
+      +'<div class="stacked" style="height:6px;margin-bottom:8px">'
+        +'<div class="s-done" style="width:'+pct(v.done,v.tot)+'%;height:6px"></div>'
+        +'<div class="s-ong" style="width:'+pct(v.ong,v.tot)+'%;height:6px"></div>'
+        +'<div class="s-ns" style="width:'+pct(v.ns,v.tot)+'%;height:6px"></div>'
+      +'</div>'
+      +'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:'+(isOpen?"10":"0")+'px">'
+        +'<span style="font-size:11px;color:#1A5F3A">'+v.done+' done</span>'
+        +(v.ong?'<span style="font-size:11px;color:#7A4A00">'+v.ong+' ongoing</span>':"")
+        +(v.ns?'<span style="font-size:11px;color:#666">'+v.ns+' not started</span>':"")
+      +'</div>'
+      +(isOpen?
+        '<div style="border-top:0.5px solid #e8e8e4;padding-top:10px;overflow-x:auto">'
+          +'<table style="width:100%;border-collapse:collapse">'
+            +'<thead><tr style="border-bottom:1.5px solid #003D4D">'
+              +'<th style="padding:5px 10px 5px 0;font-size:10px;font-weight:600;color:#003D4D;text-align:left;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">Product</th>'
+              +'<th style="padding:5px 10px;font-size:10px;font-weight:600;color:#003D4D;text-align:left;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">Category</th>'
+              +'<th style="padding:5px 10px;font-size:10px;font-weight:600;color:#003D4D;text-align:left;text-transform:uppercase;letter-spacing:.05em">Task</th>'
+              +'<th style="padding:5px 0 5px 10px;font-size:10px;font-weight:600;color:#003D4D;text-align:right;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">Status</th>'
+              +'<th style="padding:5px 0 5px 10px;font-size:10px;font-weight:600;color:#003D4D;text-align:right;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">Due</th>'
+            +'</tr></thead>'
+            +'<tbody>'+tableRows+showMoreRow+'</tbody>'
+          +'</table>'
+        +'</div>'
+      :"")
+    +'</div>';
+  }).join("");
+}
+
+function renderExec(){
+  const el=document.getElementById("exec-content");
+  const slackEl=document.getElementById("slack-text");
+  if(!el||!slackEl)return;
+
+  const totalOver=products.reduce(function(s,p){return s+getStats(p.tasks,p.launch).overdue.length;},0);
+  const atRisk=products.filter(function(p){return getStats(p.tasks,p.launch).rag==="r";}).length;
+  const watches=products.filter(function(p){return getStats(p.tasks,p.launch).rag==="a";}).length;
+  const onTrack=products.filter(function(p){return getStats(p.tasks,p.launch).rag==="g";}).length;
+  const sorted=[...products].filter(function(p){return p.launch;}).sort(function(a,b){return a.launch-b.launch;});
+
+  // RAG dot colours
+  function ragDot(rag){
+    const clr=rag==="r"?"#E24B4A":rag==="a"?"#BA7517":"#1D9E75";
+    return '<span class="rag-dot" style="background:'+clr+'"></span>';
+  }
+  function ragLabel(rag){return rag==="r"?"At risk":rag==="a"?"Watch":"On track";}
+  function ragClr(rag){return rag==="r"?"#8B1A1A":rag==="a"?"#7A4A00":"#1A5F3A";}
+  function ragBg(rag){return rag==="r"?"#FDECEA":rag==="a"?"#FEF3E2":"#E0F2EA";}
+
+  // Portfolio summary strip
+  const summaryStrip=
+    '<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.25rem">'
+      +'<div style="background:#fff;border:0.5px solid #e0e0d8;border-radius:8px;padding:12px 14px;text-align:center">'
+        +'<div style="font-size:28px;font-weight:700;color:#003D4D">'+products.length+'</div>'
+        +'<div style="font-size:11px;color:#666;margin-top:2px">Active launches</div>'
+      +'</div>'
+      +'<div style="background:#fff;border:0.5px solid '+(atRisk?"#f7c1c1":"#e0e0d8")+'";border-radius:8px;padding:12px 14px;text-align:center">'
+        +'<div style="font-size:28px;font-weight:700;color:'+(atRisk?"#A32D2D":"#1A5F3A")+'">'+onTrack+'</div>'
+        +'<div style="font-size:11px;color:#666;margin-top:2px">On track</div>'
+      +'</div>'
+      +'<div style="background:#fff;border:0.5px solid '+(atRisk?"#f7c1c1":"#e0e0d8")+'";border-radius:8px;padding:12px 14px;text-align:center">'
+        +'<div style="font-size:28px;font-weight:700;color:'+(atRisk?"#A32D2D":"#003D4D")+'">'+atRisk+'</div>'
+        +'<div style="font-size:11px;color:#666;margin-top:2px">At risk'+(watches?' \u00b7 '+watches+' watch':'')+'</div>'
+      +'</div>'
+      +'<div style="background:#fff;border:0.5px solid '+(totalOver?"#f7c1c1":"#e0e0d8")+'";border-radius:8px;padding:12px 14px;text-align:center">'
+        +'<div style="font-size:28px;font-weight:700;color:'+(totalOver?"#A32D2D":"#003D4D")+'">'+totalOver+'</div>'
+        +'<div style="font-size:11px;color:#666;margin-top:2px">Overdue tasks</div>'
+      +'</div>'
+    +'</div>';
+
+  // Product table
+  const tableRows=sorted.map(function(p){
+    const s=getStats(p.tasks,p.launch);
+    const daysLabel=s.days===null?"—":s.days<=0?"Launched":s.days+"d";
+    const dayClr=s.days!==null&&s.days<30?"#A32D2D":s.days!==null&&s.days<60?"#7A4A00":"#003D4D";
+    return '<tr>'
+      +'<td style="padding:13px 14px">'
+        +'<div style="font-size:13px;font-weight:500;color:#003D4D">'+p.name+'</div>'
+        +(p.live?'<span class="live-tag" style="margin-top:3px;display:inline-block">live</span>':'')
+      +'</td>'
+      +'<td style="padding:13px 14px;font-size:13px;color:#444;white-space:nowrap">'+fmtDShort(p.launch)+'</td>'
+      +'<td style="padding:13px 14px;font-size:13px;font-weight:600;color:'+dayClr+';white-space:nowrap">'+daysLabel+'</td>'
+      +'<td style="padding:13px 14px">'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+          +'<div style="flex:1;background:#f0f0ee;border-radius:3px;height:6px;min-width:80px">'
+            +'<div style="height:6px;border-radius:3px;background:'+(s.rag==="r"?"#E24B4A":s.rag==="a"?"#BA7517":"#1D9E75")+';width:'+s.pctDone+'%"></div>'
+          +'</div>'
+          +'<span style="font-size:12px;font-weight:500;color:#003D4D;min-width:32px">'+s.pctDone+'%</span>'
+        +'</div>'
+      +'</td>'
+      +'<td style="padding:13px 14px;text-align:center">'
+        +'<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:500;background:'+ragBg(s.rag)+';color:'+ragClr(s.rag)+'">'
+          +ragDot(s.rag)+' '+ragLabel(s.rag)
+        +'</span>'
+      +'</td>'
+      +'<td style="padding:13px 14px;text-align:right">'
+        +(s.overdue.length?'<span style="font-size:12px;font-weight:500;color:#A32D2D">'+s.overdue.length+' overdue</span>':'<span style="font-size:12px;color:#999">—</span>')
+      +'</td>'
+    +'</tr>';
+  }).join("");
+
+  const table=
+    '<div class="exec-card">'
+      +'<div style="font-size:13px;font-weight:500;color:#003D4D;margin-bottom:12px">Launch status as of '+fmtDShort(TODAY)+'</div>'
+      +'<div style="overflow-x:auto">'
+        +'<table class="exec-table">'
+          +'<thead><tr>'
+            +'<th>Product</th>'
+            +'<th>Launch date</th>'
+            +'<th>Days out</th>'
+            +'<th>Progress</th>'
+            +'<th style="text-align:center">Status</th>'
+            +'<th style="text-align:right">Overdue</th>'
+          +'</tr></thead>'
+          +'<tbody>'+tableRows+'</tbody>'
+        +'</table>'
+      +'</div>'
+    +'</div>';
+
+  el.innerHTML=summaryStrip+table;
+
+  // Build Slack message
+  const ragEmoji={"r":"\uD83D\uDD34","a":"\uD83D\uDFE1","g":"\uD83D\uDFE2"};
+  const lines=[];
+  lines.push("*\uD83D\uDE80 Riversol NPD \u2014 Weekly Launch Update*");
+  lines.push("_"+fmtDShort(TODAY)+"_");
+  lines.push("");
+  lines.push("*Portfolio at a glance*");
+  lines.push("\u2022 "+products.length+" active launches  |  "+onTrack+" on track  |  "+atRisk+" at risk  |  "+totalOver+" overdue tasks");
+  lines.push("");
+  lines.push("*Product status*");
+  sorted.forEach(function(p){
+    const s=getStats(p.tasks,p.launch);
+    const emoji=ragEmoji[s.rag]||"\uD83D\uDFE2";
+    const daysStr=s.days===null?"TBC":s.days<=0?"Launched":s.days+"d to launch";
+    const overStr=s.overdue.length?" | "+s.overdue.length+" overdue":"";
+    lines.push(emoji+" *"+p.name+"*  \u2014  "+daysStr+"  |  "+s.pctDone+"% complete"+overStr);
+  });
+  lines.push("");
+  lines.push("_View live dashboard: [paste your GitHub Pages link here]_");
+
+  slackEl.textContent=lines.join("\n");
+}
+
+window.copySlack=function(){
+  const txt=document.getElementById("slack-text").textContent;
+  navigator.clipboard.writeText(txt).then(function(){
+    const c=document.getElementById("copy-confirm");
+    if(c){c.style.display="block";setTimeout(function(){c.style.display="none";},2000);}
+  });
+};
+
+window.selectProduct=function(id){
+  activeId=activeId===id?null:id;
+  renderGrid();
+  renderDetail(activeId?products.find(function(p){return p.id===activeId;}):null);
+};
+window.toggleCat=function(pid,cat){var k=pid+cat;openCats[k]=!openCats[k];renderDetail(products.find(function(p){return p.id===pid;}));};
+window.toggleOwner=function(pid,o){var k=pid+o;openOwners[k]=!openOwners[k];renderDetail(products.find(function(p){return p.id===pid;}));};
+window.toggleTeamOwner=function(o){openTeamOwners[o]=!openTeamOwners[o];renderTeam();};
+window.toggleTeamOwnerAll=function(btn){var o=btn.getAttribute("data-owner");openTeamOwners[o+"_all"]=!openTeamOwners[o+"_all"];renderTeam();};
+window.toggleHideComplete=function(){hideComplete=!hideComplete;renderTeam();};
+window.kpiClick=function(type){
+  if(type==="overdue"){
+    document.querySelectorAll(".vbtn").forEach(function(b){b.classList.toggle("on",b.dataset.view==="team");});
+    document.getElementById("view-portfolio").style.display="none";
+    document.getElementById("view-team").style.display="";
+    document.getElementById("view-exec").style.display="none";
+    hideComplete=true;
+    var ownerSet=new Set();
+    products.forEach(function(p){p.tasks.forEach(function(t){if(t.dueDate&&t.dueDate<TODAY&&t.resolved!=="Complete")t.owners.forEach(function(o){ownerSet.add(o);});});});
+    ownerSet.forEach(function(o){openTeamOwners[o]=true;});
+    renderTeam();
+  } else {
+    document.querySelectorAll(".vbtn").forEach(function(b){b.classList.toggle("on",b.dataset.view==="portfolio");});
+    document.getElementById("view-portfolio").style.display="";
+    document.getElementById("view-team").style.display="none";
+    document.getElementById("view-exec").style.display="none";
+    if(type==="atrisk"){
+      var rp=products.find(function(p){return getStats(p.tasks,p.launch).rag==="r";});
+      if(rp){activeId=rp.id;renderGrid();renderDetail(rp);}else{renderGrid();}
+    } else if(type==="nextlaunch"){
+      var np=[...products].filter(function(p){return p.launch&&getStats(p.tasks,p.launch).days>0;}).sort(function(a,b){return getStats(a.tasks,a.launch).days-getStats(b.tasks,b.launch).days;})[0];
+      if(np){activeId=np.id;renderGrid();renderDetail(np);}
+    } else {
+      activeId=null;renderGrid();renderDetail(null);
+    }
+  }
+};
+
+document.querySelectorAll(".vbtn").forEach(function(b){
+  b.addEventListener("click",function(){
+    document.querySelectorAll(".vbtn").forEach(function(x){x.classList.toggle("on",x===b);});
+    document.getElementById("view-portfolio").style.display=b.dataset.view==="portfolio"?"":"none";
+    document.getElementById("view-team").style.display=b.dataset.view==="team"?"":"none";
+    document.getElementById("view-exec").style.display=b.dataset.view==="exec"?"":"none";
+    if(b.dataset.view==="team")populateTeamFilters();
+  });
+});
+
+const liveCount=PRODUCT_CONFIG.filter(function(p){return p.csvUrl;}).length;
+const staticCount=PRODUCT_CONFIG.filter(function(p){return !p.csvUrl;}).length;
+document.getElementById("hdr-date").innerHTML=fmtDLong(TODAY)+'<br><span class="rs-live"><span class="live-dot"></span>'+liveCount+' live \u00b7 '+staticCount+' static</span>';
+
+Promise.all(products.map(function(p){return fetchProduct(p).then(function(){renderAll();});})).then(function(){
+  renderAll();
+  var nextp=[...products].filter(function(p){return p.launch&&getStats(p.tasks,p.launch).days>0;}).sort(function(a,b){return getStats(a.tasks,a.launch).days-getStats(b.tasks,b.launch).days;})[0];
+  if(nextp){activeId=nextp.id;renderGrid();renderDetail(nextp);}
+});
+</script>
+</body>
+</html>
