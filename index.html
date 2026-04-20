@@ -83,6 +83,83 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,san
 
 
 @media(max-width:600px){.kpis{grid-template-columns:1fr 1fr}.prod-grid{grid-template-columns:1fr}body{padding:.75rem}}
+/* Dark mode */
+:root{
+  --bg-page:#f5f5f3;--bg-card:#fff;--bg-secondary:#f7f9fa;--bg-secondary2:#f0f0ee;
+  --text-primary:#1a1a1a;--text-secondary:#666;--text-tertiary:#999;
+  --border:#e0e0d8;--border-light:#f0f0ee;
+  --teal:#003D4D;--teal-lt:#E0EEF1;--teal-mid:#a8ccd4;
+}
+body.dark{
+  --bg-page:#111c26;--bg-card:#1b2a38;--bg-secondary:#223040;--bg-secondary2:#2a3a4a;
+  --text-primary:#f0f4f7;--text-secondary:#b8cdd8;--text-tertiary:#7a9aaa;
+  --border:#2e4255;--border-light:#223040;
+  --teal:#5bc4de;--teal-lt:#1e3a4a;--teal-mid:#4a9ab0;
+}
+body{background:var(--bg-page);color:var(--text-primary)}
+.kpi{background:var(--bg-card);border-color:var(--border)}
+.prod-card{background:var(--bg-card);border-color:var(--border)}
+.prod-card:hover{border-color:var(--teal)}
+.prod-card.active{border-color:var(--teal)}
+.prod-card-bar-wrap{background:var(--bg-secondary2)}
+.detail-panel{background:var(--bg-card);border-color:var(--border)}
+.detail-hdr{border-color:var(--border)}
+.grp-card{background:var(--bg-card);border-color:var(--border)}
+.grp-card:hover{border-color:var(--border)}
+.task-row{border-color:var(--border-light)}
+.vtabs{border-color:var(--border)}
+.vtab{color:var(--text-secondary)}
+.vtab.on{color:var(--teal);border-bottom-color:var(--teal)}
+.loading-card{background:var(--bg-secondary)}
+.po-card{background:var(--bg-card);border-color:var(--border)}
+.po-card:hover{border-color:var(--teal)}
+.exec-card{background:var(--bg-card);border-color:var(--border)}
+.section-label{color:var(--text-tertiary)}
+.b-ns{background:var(--bg-secondary2);color:var(--text-secondary)}
+.static-tag{background:var(--bg-secondary2);color:var(--text-tertiary)}
+.dark .kpi-l{color:var(--text-secondary)}
+.dark .kpi-hint{color:var(--text-tertiary)}
+.dark .kpi-v{color:var(--text-primary)}
+body.dark{color:var(--text-primary)}
+.dark .rs-subtitle{color:#7ab8cc}
+.dark .section-label{color:var(--text-tertiary)}
+/* Force readable text on dynamic inline-styled elements in dark mode */
+.dark .prod-card-bot span:not(.rag-pill):not(.days-badge):not(.live-tag):not(.static-tag){color:var(--text-secondary) !important}
+.dark .grp-card > div > span:first-child{color:var(--teal) !important}
+.dark .task-row > span:first-child{color:var(--text-primary) !important}
+.dark .task-row > span:last-child{color:var(--text-tertiary) !important}
+.dark .po-card > div > div > div:first-child{color:var(--teal) !important}
+.dark .detail-title{color:var(--teal)}
+.dark .detail-sub{color:var(--text-secondary)}
+.dark table td{color:var(--text-primary)}
+.dark table th{color:#fff}
+/* Exec card text */
+.dark .exec-card{color:var(--text-primary)}
+.dark .exec-card span[style*="color:#666"]{color:var(--text-secondary) !important}
+.dark .exec-card span[style*="color:#999"]{color:var(--text-tertiary) !important}
+.dark .exec-card span[style*="color:#1a1a1a"]{color:var(--text-primary) !important}
+.dark .exec-card div[style*="color:#666"]{color:var(--text-secondary) !important}
+.dark .exec-card div[style*="color:#999"]{color:var(--text-tertiary) !important}
+.dark .exec-card div[style*="color:#1a1a1a"]{color:var(--text-primary) !important}
+/* Product card text */
+.dark .prod-card-top div[style*="color:#666"]{color:var(--text-secondary) !important}
+.dark .prod-card-top span[style*="color:#003D4D"]:not(.rag-pill *){color:var(--teal) !important}
+/* Team grid */
+.dark .po-card div[style*="color:#666"]{color:var(--text-secondary) !important}
+.dark .po-card div[style*="color:#1a1a1a"]{color:var(--text-primary) !important}
+.dark .po-card td[style*="color:#1a1a1a"]{color:var(--text-primary) !important}
+.dark .po-card td[style*="color:#666"]{color:var(--text-secondary) !important}
+/* Badge overrides in dark */
+.dark .b-ns{background:#2a3a4a;color:#8ab0c0}
+
+/* Dark mode toggle button */
+.dark-toggle{width:36px;height:20px;border-radius:10px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;padding:0;background:#003D4D}
+.dark .dark-toggle{background:#4ab3cc}
+.dark-toggle::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s;transform:translateX(0)}
+.dark .dark-toggle::after{transform:translateX(16px)}
+.toggle-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.toggle-label{font-size:11px;color:#a8ccd4}
+
 /* Safari mobile fixes */
 *{-webkit-tap-highlight-color:transparent}
 button,select{-webkit-appearance:none;appearance:none}
@@ -110,7 +187,13 @@ body{-webkit-overflow-scrolling:touch}
     <div class="rs-wordmark">Riversol</div>
     <div class="rs-subtitle">NPD launch portfolio</div>
   </div>
-  <div class="rs-date" id="hdr-date"></div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="rs-date" id="hdr-date"></div>
+    <div class="toggle-wrap">
+      <span class="toggle-label" id="dark-label">Light</span>
+      <button class="dark-toggle" onclick="toggleDark()" aria-label="Toggle dark mode"></button>
+    </div>
+  </div>
 </div>
 
 <div class="kpis" id="kpis">
@@ -977,6 +1060,15 @@ window.downloadPDF=function(){
 
   doc.save("Riversol_NPD_Report_"+new Date().toISOString().slice(0,10)+".pdf");
 };
+
+window.toggleDark=function(){
+  var isDark=document.body.classList.toggle("dark");
+  var label=document.getElementById("dark-label");
+  if(label)label.textContent=isDark?"Dark":"Light";
+  try{localStorage.setItem("rsDark",isDark?"1":"0");}catch(e){}
+};
+// Restore dark mode preference
+try{if(localStorage.getItem("rsDark")==="1"){document.body.classList.add("dark");var l=document.getElementById("dark-label");if(l)l.textContent="Dark";}}catch(e){}
 
 window.selectProduct=function(id){activeId=activeId===id?null:id;renderGrid();renderDetail(activeId?products.find(function(p){return p.id===activeId;}):null);};
 window.toggleCat=function(pid,cat){var k=pid+cat;openCats[k]=!openCats[k];renderDetail(products.find(function(p){return p.id===pid;}));};
