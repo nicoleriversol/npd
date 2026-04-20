@@ -123,34 +123,32 @@ body{background:var(--bg-page);color:var(--text-primary)}
 body.dark{color:var(--text-primary)}
 .dark .rs-subtitle{color:#7ab8cc}
 .dark .section-label{color:var(--text-tertiary)}
-/* Force readable text on dynamic inline-styled elements in dark mode */
-.dark .prod-card-bot span:not(.rag-pill):not(.days-badge):not(.live-tag):not(.static-tag){color:var(--text-secondary) !important}
-.dark .grp-card > div > span:first-child{color:var(--teal) !important}
-.dark .task-row > span:first-child{color:var(--text-primary) !important}
-.dark .task-row > span:last-child{color:var(--text-tertiary) !important}
-.dark .po-card > div > div > div:first-child{color:var(--teal) !important}
 .dark .detail-title{color:var(--teal)}
 .dark .detail-sub{color:var(--text-secondary)}
-.dark table td{color:var(--text-primary)}
-.dark table th{color:#fff}
-/* Exec card text */
-.dark .exec-card{color:var(--text-primary)}
-.dark .exec-card span[style*="color:#666"]{color:var(--text-secondary) !important}
-.dark .exec-card span[style*="color:#999"]{color:var(--text-tertiary) !important}
-.dark .exec-card span[style*="color:#1a1a1a"]{color:var(--text-primary) !important}
-.dark .exec-card div[style*="color:#666"]{color:var(--text-secondary) !important}
-.dark .exec-card div[style*="color:#999"]{color:var(--text-tertiary) !important}
-.dark .exec-card div[style*="color:#1a1a1a"]{color:var(--text-primary) !important}
-/* Product card text */
-.dark .prod-card-top div[style*="color:#666"]{color:var(--text-secondary) !important}
-.dark .prod-card-top span[style*="color:#003D4D"]:not(.rag-pill *){color:var(--teal) !important}
-/* Team grid */
-.dark .po-card div[style*="color:#666"]{color:var(--text-secondary) !important}
-.dark .po-card div[style*="color:#1a1a1a"]{color:var(--text-primary) !important}
-.dark .po-card td[style*="color:#1a1a1a"]{color:var(--text-primary) !important}
-.dark .po-card td[style*="color:#666"]{color:var(--text-secondary) !important}
-/* Badge overrides in dark */
 .dark .b-ns{background:#2a3a4a;color:#8ab0c0}
+/* Universal inline style overrides for dark mode */
+body.dark [style*="color:#1a1a1a"]{color:var(--text-primary) !important}
+body.dark [style*="color:#666666"]{color:var(--text-secondary) !important}
+body.dark [style*="color:#666"]{color:var(--text-secondary) !important}
+body.dark [style*="color:#999"]{color:var(--text-tertiary) !important}
+body.dark [style*="color:#003D4D"]:not(.rs-header *):not(.rag-pill):not(.days-badge):not(.live-tag):not(.vbtn.on):not(.vtab.on){color:var(--teal) !important}
+body.dark [style*="background:#fff"]{background:var(--bg-card) !important}
+body.dark [style*="background:#f7f9fa"]{background:var(--bg-secondary) !important}
+body.dark [style*="background:#f5f5f3"]{background:var(--bg-secondary) !important}
+body.dark [style*="background:#f0f0ee"]{background:var(--bg-secondary2) !important}
+body.dark [style*="border-bottom:0.5px solid #f0f0ee"]{border-bottom-color:var(--border-light) !important}
+body.dark [style*="border-bottom:0.5px solid #f5f5f3"]{border-bottom-color:var(--border-light) !important}
+body.dark [style*="border-bottom:0.5px solid #e8e8e4"]{border-bottom-color:var(--border) !important}
+body.dark [style*="border-bottom:0.5px solid #e0e0d8"]{border-bottom-color:var(--border) !important}
+body.dark [style*="border-top:0.5px solid #e8e8e4"]{border-top-color:var(--border) !important}
+body.dark [style*="border-top:1.5px solid #003D4D"]{border-top-color:var(--teal) !important}
+body.dark [style*="border-bottom:1.5px solid #003D4D"]{border-bottom-color:var(--teal) !important}
+/* Table rows in dark */
+body.dark table{color:var(--text-primary)}
+body.dark thead tr{background:#1a3a4a !important}
+body.dark [style*="background:#fff;border-bottom"]{background:var(--bg-card) !important}
+/* Exec card specific */
+body.dark .exec-card *{border-color:var(--border) !important}
 
 /* Dark mode toggle button */
 .dark-toggle{width:36px;height:20px;border-radius:10px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;padding:0;background:#003D4D}
@@ -206,7 +204,7 @@ body{-webkit-overflow-scrolling:touch}
 <div class="view-btns">
   <button class="vbtn on" data-view="portfolio">Portfolio overview</button>
   <button class="vbtn" data-view="team">Team workload</button>
-  <button class="vbtn" data-view="exec">Exec summary</button>
+  <button class="vbtn" data-view="exec">Summary</button>
 </div>
 
 <!-- PORTFOLIO VIEW -->
@@ -539,21 +537,10 @@ function renderDetail(p){
         +'<div class="detail-sub">'+s.done+'/'+s.total+' tasks complete \u00b7 launch: '+fmtDLong(p.launch)+' <span style="font-size:10px;color:#999">(from Product delivery task)</span></div>'
       +'</div>'
       +(p.error?'<div class="error-note">'+p.error+'</div>':"")
-      +'<div class="vtabs" id="'+dtId+'">'
-        +'<button class="vtab on" data-dt="cat">By category</button>'
-        +'<button class="vtab" data-dt="owner">By owner</button>'
-      +'</div>'
       +'<div id="'+catId+'">'+catHTML+'</div>'
-      +'<div id="'+owId+'" style="display:none">'+owHTML+'</div>'
     +'</div>';
 
-  document.querySelectorAll("#"+dtId+" .vtab").forEach(function(b){
-    b.addEventListener("click",function(){
-      document.querySelectorAll("#"+dtId+" .vtab").forEach(function(x){x.classList.toggle("on",x===b);});
-      document.getElementById(catId).style.display=b.dataset.dt==="cat"?"":"none";
-      document.getElementById(owId).style.display=b.dataset.dt==="owner"?"":"none";
-    });
-  });
+
 }
 
 function populateTeamFilters(){
