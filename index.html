@@ -381,7 +381,8 @@ function renderKPIs(){
 }
 
 function renderGrid(){
-  document.getElementById("prod-grid").innerHTML=products.map(function(p){
+  var sortedProds=[...products].sort(function(a,b){if(!a.launch)return 1;if(!b.launch)return -1;return a.launch-b.launch;});
+  document.getElementById("prod-grid").innerHTML=sortedProds.map(function(p){
     if(!p.loaded)return '<div class="loading-card"><div class="spin"></div>'+p.name+'</div>';
     const s=getStats(p.tasks,p.launch);
     const ragLabel=s.rag==="r"?"At risk":s.rag==="a"?"Watch":"On track";
