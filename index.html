@@ -445,100 +445,68 @@ function renderDetail(p){
   function taskRow(t){
     const sc=t.resolved==="Complete"?"b-done":t.resolved==="Ongoing"?"b-ong":"b-ns";
     const chips=(t.owners||[]).map(ownerChip).join("");
+    const isOverdue=t.dueDate&&t.dueDate<TODAY&&t.resolved!=="Complete";
+    const todayStr=TODAY.toDateString();
+    const isDueToday=t.dueDate&&t.dueDate.toDateString()===todayStr&&t.resolved!=="Complete";
+    const dueLabelClr=isOverdue?"#A32D2D":"#7A4A00";
+    const dueLabel=isOverdue?"Overdue":"Due today";
     return '<div class="task-row">'
-      +'<span style="flex:1;color:#1a1a1a;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+t.task+'</span>'
-      +'<span style="display:flex;flex-wrap:wrap;gap:2px;justify-content:flex-end;min-width:120px;margin:0 8px">'+chips+'</span>'
-      +'<span class="badge '+sc+'">'+t.resolved+'</span>'
+      +'<span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;background:'+(isOverdue?"#FDECEA":"#FEF3E2")+';color:'+dueLabelClr+';white-space:nowrap;flex-shrink:0">'+dueLabel+'</span>'
+      +'<span style="flex:1;color:#1a1a1a;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 6px">'+t.task+'</span>'
+      +'<span style="display:flex;flex-wrap:wrap;gap:2px;justify-content:flex-end;min-width:80px;margin:0 8px">'+chips+'</span>'
       +'<span style="font-size:11px;color:#999;min-width:52px;text-align:right">'+fmtD(t.dueDate)+'</span>'
     +'</div>';
   }
 
-  const catHTML=Object.keys(catMap).sort().map(function(cat){
-    const ts=catMap[cat];
-    const d=ts.filter(function(t){return t.resolved==="Complete";}).length;
-    const og=ts.filter(function(t){return t.resolved==="Ongoing";}).length;
-    const n=ts.filter(function(t){return t.resolved==="Not Started";}).length;
-    const tot=ts.length;
-    const k=p.id+cat,isOpen=openCats[k];
-    const esc=cat.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
-    const pid=p.id.replace(/'/g,"\\'");
-    return '<div class="grp-card" onclick="toggleCat(\''+pid+'\',\''+esc+'\')">'
-      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">'
-        +'<span style="font-size:13px;font-weight:500;color:#003D4D;flex:1">'+cat+'</span>'
-        +'<span style="font-size:12px;color:#666">'+pct(d,tot)+'% done</span>'
-      +'</div>'
-      +'<div class="stacked" style="height:5px;margin-bottom:6px">'
-        +'<div class="s-done" style="width:'+pct(d,tot)+'%;height:5px"></div>'
-        +'<div class="s-ong" style="width:'+pct(og,tot)+'%;height:5px"></div>'
-        +'<div class="s-ns" style="width:'+pct(n,tot)+'%;height:5px"></div>'
-      +'</div>'
-      +'<div style="display:flex;gap:10px">'
-        +'<span style="font-size:11px;color:#1A5F3A">'+d+' done</span>'
-        +(og?'<span style="font-size:11px;color:#7A4A00">'+og+' ongoing</span>':"")
-        +(n?'<span style="font-size:11px;color:#666">'+n+' not started</span>':"")
-      +'</div>'
-      +'<div style="display:'+(isOpen?"block":"none")+';margin-top:10px;border-top:0.5px solid #f0f0ee;padding-top:8px">'
-        +ts.map(taskRow).join("")
-      +'</div>'
-    +'</div>';
-  }).join("");
+  // Filter to only overdue + due today (incomplete tasks only)
+  const todayStr=TODAY.toDateString();
+  function isUrgent(t){
+    if(t.resolved==="Complete")return false;
+    if(!t.dueDate)return false;
+    return t.dueDate<TODAY||t.dueDate.toDateString()===todayStr;
+  }
 
-  const owHTML=Object.keys(owMap).sort().map(function(o){
-    const ts=owMap[o];
-    const d=ts.filter(function(t){return t.resolved==="Complete";}).length;
-    const og=ts.filter(function(t){return t.resolved==="Ongoing";}).length;
-    const n=ts.filter(function(t){return t.resolved==="Not Started";}).length;
-    const tot=ts.length;
-    const col=OC[o]||defOC;
-    const k=p.id+o,isOpen=openOwners[k];
-    const esc=o.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
-    const pid=p.id.replace(/'/g,"\\'");
-    return '<div class="grp-card" onclick="toggleOwner(\''+pid+'\',\''+esc+'\')">'
-      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
-        +'<div class="av" style="background:'+col.bg+';color:'+col.fg+'">'+inits(o)+'</div>'
-        +'<div style="flex:1">'
-          +'<div style="font-size:13px;font-weight:500;color:#003D4D">'+o+'</div>'
-          +'<div style="font-size:11px;color:#666">'+tot+' tasks \u00b7 '+pct(d,tot)+'% complete</div>'
-        +'</div>'
-        +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">'
-          +(d?'<span class="badge b-done">'+d+' done</span>':"")
-          +(og?'<span class="badge b-ong">'+og+' ongoing</span>':"")
-          +(n?'<span class="badge b-ns">'+n+' not started</span>':"")
-        +'</div>'
-      +'</div>'
-      +'<div class="stacked" style="height:5px">'
-        +'<div class="s-done" style="width:'+pct(d,tot)+'%;height:5px"></div>'
-        +'<div class="s-ong" style="width:'+pct(og,tot)+'%;height:5px"></div>'
-        +'<div class="s-ns" style="width:'+pct(n,tot)+'%;height:5px"></div>'
-      +'</div>'
-      +'<div style="display:'+(isOpen?"block":"none")+';margin-top:10px;border-top:0.5px solid #f0f0ee;padding-top:8px">'
-        +["Not Started","Ongoing","Complete"].map(function(grp){
-          const gt=ts.filter(function(t){return t.resolved===grp;});
-          if(!gt.length)return"";
-          return '<div style="font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:#999;margin:6px 0 3px">'+grp+' ('+gt.length+')</div>'
-            +gt.filter(function(t){return t.dueDate;}).sort(function(a,b){return a.dueDate-b.dueDate;}).map(function(t){
-              return '<div class="task-row">'
-                +'<span style="flex:1;color:#1a1a1a;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+t.task+'</span>'
-                +'<span style="font-size:11px;color:#999;white-space:nowrap;margin:0 4px">'+t.cat+'</span>'
-                +'<span style="font-size:11px;color:#999;min-width:52px;text-align:right">'+fmtD(t.dueDate)+'</span>'
-              +'</div>';
-            }).join("");
-        }).join("")
-      +'</div>'
-    +'</div>';
-  }).join("");
+  const urgentTasks=p.tasks.filter(isUrgent);
+  const urgentByCategory={};
+  urgentTasks.forEach(function(t){
+    if(!urgentByCategory[t.cat])urgentByCategory[t.cat]=[];
+    urgentByCategory[t.cat].push(t);
+  });
 
+  const hasUrgent=urgentTasks.length>0;
+
+  const catHTML=hasUrgent
+    ? Object.keys(urgentByCategory).sort().map(function(cat){
+        const ts=urgentByCategory[cat].sort(function(a,b){return a.dueDate-b.dueDate;});
+        const pid=p.id.replace(/'/g,"\'");
+        const esc=cat.replace(/\\/g,"\\\\").replace(/'/g,"\'");
+        return '<div style="margin-bottom:6px">'
+          +'<div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#999;margin-bottom:4px;padding:0 2px">'+cat+'</div>'
+          +ts.map(taskRow).join("")
+        +'</div>';
+      }).join("")
+    : '<div style="display:flex;align-items:center;gap:8px;padding:14px 0;color:#1A5F3A">'
+        +'<span style="font-size:18px">✓</span>'
+        +'<span style="font-size:13px;font-weight:500">No overdue or due-today tasks</span>'
+      +'</div>';
+
+  var urgentCount=urgentTasks.length;
   panel.innerHTML=
     '<div class="detail-panel">'
       +'<div class="detail-hdr">'
-        +'<div style="display:flex;align-items:center;gap:8px">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
           +'<div class="detail-title">'+p.name+'</div>'
           +(p.live?'<span class="live-tag">live data</span>':'<span class="static-tag">static data</span>')
         +'</div>'
-        +'<div class="detail-sub">'+s.done+'/'+s.total+' tasks complete \u00b7 launch: '+fmtDLong(p.launch)+' <span style="font-size:10px;color:#999">(from Product delivery task)</span></div>'
+        +'<div class="detail-sub">'
+          +(urgentCount>0
+            ? '<span style="color:#A32D2D;font-weight:500">'+urgentCount+' overdue or due today</span> &nbsp;\u00b7&nbsp; '
+            : '')
+          +s.done+'/'+s.total+' tasks complete \u00b7 launch: '+fmtDLong(p.launch)
+        +'</div>'
       +'</div>'
       +(p.error?'<div class="error-note">'+p.error+'</div>':"")
-      +'<div id="'+catId+'">'+catHTML+'</div>'
+      +'<div style="padding-top:4px">'+catHTML+'</div>'
     +'</div>';
 
 
